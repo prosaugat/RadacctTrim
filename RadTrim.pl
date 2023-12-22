@@ -9,11 +9,11 @@ my $date = strftime "%Y-%m-%d %H:%M:%S", localtime;
 my $logger_cmd = "logger radacct_trim script started $date";
 system($logger_cmd);
 
-my $sql_user   = "root";
-my $sql_pass   = "YOUR_PASSWORD";
+my $sql_user   = "prosaugat";
+my $sql_pass   = "my-password";
 my $db         = "radius";
 my $tbl_arch   = "radacct_archive";
-my $months     = 12;
+my $months     = 6;
 my $mysql_pwd  = "--password=$sql_pass";
 
 my $cmd = "mysql -u$sql_user $mysql_pwd --skip-column-names -s -e";

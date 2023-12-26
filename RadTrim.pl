@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use POSIX qw(strftime);
 
-# MySQL Details
+# DB Details
 my $date = strftime "%Y-%m-%d %H:%M:%S", localtime;
 my $logger_cmd = "logger radacct_trim script started $date";
 system($logger_cmd);
@@ -18,7 +18,7 @@ my $mysql_pwd  = "--password=$sql_pass";
 
 my $cmd = "mysql -u$sql_user $mysql_pwd --skip-column-names -s -e";
 
-# Step 1: Checking for DB and TABLE
+# Checking for DB and TABLE
 print "
 Script Started \@ $date
 ";
@@ -42,7 +42,7 @@ if (`$cmd \"$tbl_arch_exists_cmd\" $db`) {
     system("$cmd \"use $db; create table if not exists $tbl_arch LIKE radacct;\"");
 }
 
-# Step 2: Copy data from radacct to new db/archive table
+# Copy data from radacct to new db/archive table
 my $notnull_count_cmd = "$cmd \"use $db; select count(*) from radacct WHERE acctstoptime is not null;\"";
 my $notnull_count     = qx($notnull_count_cmd);
 chomp($notnull_count);
@@ -50,11 +50,11 @@ chomp($notnull_count);
 print "- Step 2: Found $notnull_count records in radacct table, Now copying $notnull_count records to $tbl_arch table ...\n";
 system("$cmd \"use $db; INSERT IGNORE INTO $tbl_arch SELECT * FROM radacct WHERE acctstoptime is not null;\"");
 
-# Step 3: Deleting old data from radacct table
+# Deleting old data from radacct table
 print "- Step 3: Deleting $notnull_count records old data from radacct table (which have acctstoptime NOT NULL) ...\n";
 system("$cmd \"use $db; DELETE FROM radacct WHERE acctstoptime is not null;\"");
 
-# Step 4: Copying old data from $tbl_arch older than $months months
+# Copying old data from $tbl_arch older than $months months
 print "- Step 4: Copying old data from $tbl_arch older than $months months ...\n";
 system("$cmd \"use $db; DELETE FROM $tbl_arch WHERE date(acctstarttime) < (CURDATE() - INTERVAL $months MONTH);\"");
 
